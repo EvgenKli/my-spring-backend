@@ -24,6 +24,8 @@ deploy-java-app:
   tags:
     - build # Используется тот же Runner
   script:
-    # Runner отправляет команду обновления на Мастер-ноду K8s по SSH
+    # Runner отправляет команду обновления на Мастер-ноду K8s
+    # Запускаем SSH, принудительно передавая файл ключа из переменной GitLab
+    # Опция -o WarnWeakCrypto=no отключает квантовое предупреждение OpenSSH
     # Принудительно перезапускаем deployment, и Kubernetes сам скачивает свежий образ из Registry
-    - ssh -o StrictHostKeyChecking=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
+    - ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
