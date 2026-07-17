@@ -1,6 +1,9 @@
+# 1. Объявляем два последовательных этапа конвейера
 stages:
   - build-and-pack
+  - deploy-to-k8s
 
+# Этап сборки
 build-java-app:
   stage: build-and-pack
   tags:
@@ -15,3 +18,12 @@ build-java-app:
 
     # 3. Runner отправляет готовый образ на GitLab Container Registry
     - docker push $CI_REGISTRY_IMAGE:latest
+
+build-java-app:
+  stage: deploy-to-k8s
+  tags:
+    - build # Используется тот же Runner
+  script:
+    # Runner отправляет команду обновления на Мастер-ноду K8s по SSH
+    # Принудительно перезапускаем deployment, и Kubernetes сам скачивает свежий образ из Registry
+    - ssh -o StrictHostKeyChecking=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
