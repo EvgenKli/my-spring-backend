@@ -24,11 +24,17 @@ deploy-java-app:
   tags:
     - build # Используется тот же Runner
   script:
-    # Принудительно выставляем права "только для владельца" на файл ключа
-    - chmod 400 $SSH_PRIVATE_KEY
+    # 1. Создаем пустую папку для SSH-настроек в домашней директории раннера
+    - mkdir -p ~/.ssh
+
+     # 2. Записываем текст ключа во временный файл
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+
+    # 3. Выставляем жесткие права безопасности "только для владельца"
+    - chmod 600 ~/.ssh/id_rsa
+
+    # 4. Запускаем SSH-деплой, используя файл ключа
+    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
     
-    # Runner отправляет команду обновления на Мастер-ноду K8s
-    # Запускаем SSH, принудительно передавая файл ключа из переменной GitLab
-    # Опция -o WarnWeakCrypto=no отключает квантовое предупреждение OpenSSH
-    # Принудительно перезапускаем deployment, и Kubernetes сам скачивает свежий образ из Registry
-    - ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
+    # 5. Удаляем приватный ключ с диска после выполнения команды
+    - rm -f ~/.ssh/id_rsa
