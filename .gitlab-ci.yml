@@ -19,7 +19,7 @@ build-java-app:
     # 3. Runner отправляет готовый образ на GitLab Container Registry
     - docker push $CI_REGISTRY_IMAGE:latest
 
-build-java-app:
+deploy-java-app:
   stage: deploy-to-k8s
   tags:
     - build # Используется тот же Runner
