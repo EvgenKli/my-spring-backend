@@ -9,6 +9,6 @@ public class MainController {
     // Метод обрабатывает чистый корень сайта
     @GetMapping("/")
     public String index() {
-        return "Welcome to EvgenKli Production Cluster! Kubernetes Infrastructure is Fully Operational!";
+        return "Welcome to EvgenKli Production Cluster!";
     }
 }
