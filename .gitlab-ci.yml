@@ -13,8 +13,8 @@ build-java-app:
     # 1. Runner авторизируется в Container Registry
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN
 
-    # 2. Runner запускает сборку Docker-образа, используя Dockerfile
-    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    # 2. Runner запускает сборку Docker-образа, используя Dockerfile. Флаг --no-cache принудительно запускает компиляцию заново
+    - docker build --no-cache -t $CI_REGISTRY_IMAGE:latest .
 
     # 3. Runner отправляет готовый образ на GitLab Container Registry
     - docker push $CI_REGISTRY_IMAGE:latest
