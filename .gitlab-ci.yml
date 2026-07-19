@@ -36,11 +36,11 @@ deploy-java-app:
     # 4.1. Запускаем SSH-деплой, используя файл ключа
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
 
-    # Ждем, пока новые контейнеры полностью подменят старые
-    - sleep 15
+    # LEGACY Ждем, пока новые контейнеры полностью подменят старые
+    # - sleep 15
 
-    # 4.2. Перезапускаем службу проброса портов, чтобы она переподключилась к новым подам
-    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "sudo systemctl restart k8s-port-forward.service"
-    
+    # LEGACY 4.2. Перезапускаем службу проброса портов, чтобы она переподключилась к новым подам
+    # - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "sudo systemctl restart k8s-port-forward.service"
+  
     # 5. Удаляем приватный ключ с диска после выполнения команды
     - rm -f ~/.ssh/id_rsa
