@@ -18,8 +18,7 @@ public class CustomErrorController implements ErrorController {
         response.put("documentation", "Find the full guide in our repository: https://gitlab.com/evgen.klimanow/my-spring-backend");
         
         // Шпаргалка по командам для пользователя
-        response.put("hint_1_create_user", "curl -X POST http://5.35.28.230:8085/users -H \"Content-Type: application/json\" -d '{\"name\": \"EvgenKli\", \"email\": \"devops@example.com\"}'");
-        response.put("hint_2_get_users", "curl http://5.35.28.230:8085/users");
+        response.put("hint_get_users", "curl http://5.35.28.230:8085/users");
         
         return response;
     }
