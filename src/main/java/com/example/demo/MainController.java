@@ -9,6 +9,6 @@ public class MainController {
     // Метод обрабатывает чистый корень сайта
     @GetMapping("/")
     public String index() {
-        return "Welcome to EvgenKli Production Cluster!";
+        return "Welcome to EvgenKli Production Cluster, a armyane akhueli!";
     }
 }
