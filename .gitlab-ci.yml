@@ -37,7 +37,7 @@ deploy-java-app:
 
     # 4. Применяем манифесты в кластере K8s
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl apply -R -f /root/my-k8s-manifests/"
-
+    
     # 5. Перезапускаем деплоймент для подтягивания свежего образа
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
 
