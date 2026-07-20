@@ -33,10 +33,10 @@ deploy-java-app:
     - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@5.35.28.230 "mkdir -p /root/my-k8s-manifests/"
 
     # 3. Копируем папку k8s/ с локальной машины на Master-ноду по SCP в целевую папку
-    - scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r k8s/ root@5.35.28.230:/root/my-k8s-manifests/
+    - scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r k8s/. root@5.35.28.230:/root/my-k8s-manifests/
 
     # 4. Применяем манифесты в кластере K8s
-    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl apply -f /root/my-k8s-manifests/"
+    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl apply -R -f /root/my-k8s-manifests/"
 
     # 5. Перезапускаем деплоймент для подтягивания свежего образа
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
