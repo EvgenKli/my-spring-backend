@@ -29,14 +29,17 @@ deploy-java-app:
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa # Записываем текст ключа во временный файл
     - chmod 600 ~/.ssh/id_rsa                 # Выставляем жесткие права безопасности
 
-    # 2. Копируем папку k8s/ с локальной машины на Master-ноду по SCP
+    # 2. Создаем целевую папку на МасMaster-ноде перед копированием
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@5.35.28.230 "mkdir -p /root/my-k8s-manifests/"
+
+    # 3. Копируем папку k8s/ с локальной машины на Master-ноду по SCP в целевую папку
     - scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r k8s/ root@5.35.28.230:/root/my-k8s-manifests/
 
-    # 3. Kubernetes применяет скопированные файлы
+    # 4. Применяем манифесты в кластере K8s
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl apply -f /root/my-k8s-manifests/"
 
-    # 4. Форсируем скачивание свежего Docker-образа, если сам манифест не менялся
+    # 5. Перезапускаем деплоймент для подтягивания свежего образа
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
 
-    # 5. Подчищаем за собой секретные ключи
+    # 6. Подчищаем за собой секретные ключи
     - rm -f ~/.ssh/id_rsa
