@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-backend-deployment
+  labels:
+    app: java-backend
+spec:
+  # Промышленный стандарт - просим K8s всегда держать запущенными 2 копии приложения
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-backend
+  template:
+    metadata:
+      labels:
+        app: java-backend
+    spec:
+      # hostNetwork: true # Добавлял как временное решение (перенаправляли NodePort на Мастер-ноду) - не оправдало надежд
+      containers:
+      - name: spring-app
+        # Указываем собранный образ из Docker Hub
+        image: registry.gitlab.com/evgen.klimanow/my-spring-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        # Добавляем пробу - K8s не пустит трафик, пока Java не ответит успехом на корневой путь
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15 # Даем Spring Boot паузу на запуск перед первой проверкой
+          periodSeconds: 5
+
+        # Передаем настройки подключения к базе PostgresSQL
+        env:
+        - name: SPRING_DATASOUCE_URL
+          value: "jdbc:postgresql://111.88.218.191/java_app_db"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "java_user"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "SuperSecureJavaPassword123"
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: "update"

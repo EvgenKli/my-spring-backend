@@ -1,4 +1,4 @@
-# 1. Объявляем два последовательных этапа конвейера
+# Объявляем этапы конвейера
 stages:
   - build-and-pack
   - deploy-to-k8s
@@ -24,23 +24,19 @@ deploy-java-app:
   tags:
     - build # Используется тот же Runner
   script:
-    # 1. Создаем пустую папку для SSH-настроек в домашней директории раннера
-    - mkdir -p ~/.ssh
+    # 1. Подготовка SSH-инфраструктуры
+    - mkdir -p ~/.ssh                         # Создаем папку для SSH в домашней директории раннера
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa # Записываем текст ключа во временный файл
+    - chmod 600 ~/.ssh/id_rsa                 # Выставляем жесткие права безопасности
 
-     # 2. Записываем текст ключа во временный файл
-    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    # 2. Копируем папку k8s/ с локальной машины на Master-ноду по SCP
+    - scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r k8s/ root@5.35.28.230:/root/my-k8s-manifests/
 
-    # 3. Выставляем жесткие права безопасности "только для владельца"
-    - chmod 600 ~/.ssh/id_rsa
+    # 3. Kubernetes применяет скопированные файлы
+    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl apply -f /root/my-k8s-manifests/"
 
-    # 4.1. Запускаем SSH-деплой, используя файл ключа
+    # 4. Форсируем скачивание свежего Docker-образа, если сам манифест не менялся
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "kubectl rollout restart deployment/spring-backend-deployment"
 
-    # LEGACY Ждем, пока новые контейнеры полностью подменят старые
-    # - sleep 15
-
-    # LEGACY 4.2. Перезапускаем службу проброса портов, чтобы она переподключилась к новым подам
-    # - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o WarnWeakCrypto=no root@5.35.28.230 "sudo systemctl restart k8s-port-forward.service"
-  
-    # 5. Удаляем приватный ключ с диска после выполнения команды
+    # 5. Подчищаем за собой секретные ключи
     - rm -f ~/.ssh/id_rsa

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-backend-service
+spec:
+  selector:
+    app: java-backend
+  ports:
+    - protocol: TCP
+      port: 8080          # Порт, который слушает Сервис
+      targetPort: 8080    # Порт внутри Пода, куда перенаправлять трафик
+      # nodePort: 30085   # LEGACY - Фафиксируем внешний порт на IP мастера - способ не сработал
+  type: ClusterIP         # Внутренний тип сети кластера (заменили на ClusterIP, пробовали NodePort - не завелось)
+
+############################################
+# This text added to check GitOps Function #
+############################################
